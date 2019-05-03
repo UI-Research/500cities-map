@@ -1,66 +1,108 @@
-import React from 'react';
-import ReactMapGL from 'react-map-gl';
+import React, { Component } from 'react';
+import mapboxgl from 'mapbox-gl';
 
-// import mapboxgl from 'mapbox-gl'
-// import Tooltip from './components/tooltip'
+const d3 = require('d3-geo');
 
+mapboxgl.accessToken = 'pk.eyJ1IjoidXJiYW5pbnN0aXR1dGUiLCJhIjoiTEJUbmNDcyJ9.mbuZTy4hI_PWXw3C3UFbDQ';
 
-class Application extends React.Component {
+class App extends Component {
 
-  // setTooltip(features) {
-  //   if (features.length) {
-  //     ReactDOM.render(
-  //       React.createElement(
-  //         Tooltip, {
-  //           features
-  //         }
-  //       ),
-  //       this.tooltipContainer
-  //     );
-  //   } else {
-  //     ReactDOM.unmountComponentAtNode(this.tooltipContainer);
-  //   }
-  // }
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      lng: -1.9209,
+      lat: 2.5328,
+      zoom: 3.71
+    };
+  }
 
-//   componentDidMount() {
+  componentDidMount() {
 
-//     // Container to put React generated content in.
-//     this.tooltipContainer = document.createElement('div');
+    const granteeStyle = 'mapbox://styles/urbaninstitute/cjv8964e6apjc1fo42nrwlp2l';
 
-//     const map = new mapboxgl.Map({
-//       container: this.mapContainer,
-//       style: 'mapbox://styles/urbaninstitute/cjm9fzb762tdd2ro26791vasq',
-//     });
+    const { lng, lat, zoom } = this.state;
 
-// //     let R = 6378137.0; // radius of Earth in meters
-// // const projection = d3.geoAlbersUsa().translate([0, 0]).scale(R);
-// // const projectionMercartor = d3.geoMercator().translate([0, 0]).scale(R);
+    const map = new mapboxgl.Map({
+      container: this.mapContainer,
+      style: granteeStyle,
+      center: [lng, lat],
+      zoom
+    });
 
+    var geojson = {
+      type: 'FeatureCollection',
+      features: [{
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [-77.032, 38.913]
+        },
+        properties: {
+          title: 'Mapbox',
+          description: 'Washington, D.C.'
+        }
+      },
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [-122.414, 37.776]
+        },
+        properties: {
+          title: 'Mapbox',
+          description: 'San Francisco, California'
+        }
+      }]
+    };
 
-//     const tooltip = new mapboxgl.Marker(this.tooltipContainer, {
-//       offset: [-120, 0]
-//     }).setLngLat([0,0]).addTo(map);
     
-//     map.on('mousemove', (e) => {
-//       const features = map.queryRenderedFeatures(e.point);
-//       tooltip.setLngLat(e.lngLat);
-//       map.getCanvas().style.cursor = features.length ? 'pointer' : '';
-//       this.setTooltip(features);
-//     });
-//   }
+
+    // add markers to map
+    geojson.features.forEach(function(marker) {
+
+      // create a HTML element for each feature
+      var el = document.createElement('div');
+      el.className = 'marker';
+
+      // Adjust the projection to match our special map
+      // TODO: credit this in comments at least!
+      let R = 6378137.0; // radius of Earth in meters
+      const projection = d3.geoAlbersUsa().translate([0, 0]).scale(R);
+      const projectionMercartor = d3.geoMercator().translate([0, 0]).scale(R);
+
+      // make a marker for each feature and add to the map
+      new mapboxgl.Marker(el)
+        .setLngLat(projectionMercartor.invert(projection(marker.geometry.coordinates)))
+        .setPopup(new mapboxgl.Popup({ offset: 25 }) // add popups
+          .setHTML('<h3>' + marker.properties.title + '</h3><p>' + marker.properties.description + '</p>'))
+        .addTo(map);
+
+    });
+
+    map.on('move', () => {
+      const { lng, lat } = map.getCenter();
+
+      this.setState({
+        lng: lng.toFixed(4),
+        lat: lat.toFixed(4),
+        zoom: map.getZoom().toFixed(2)
+      });
+    });
+  }
 
   render() {
+    const { lng, lat, zoom } = this.state;
+
     return (
-      <ReactMapGL
-        mapboxApiAccessToken="pk.eyJ1IjoidXJiYW5pbnN0aXR1dGUiLCJhIjoiTEJUbmNDcyJ9.mbuZTy4hI_PWXw3C3UFbDQ"
-        mapStyle="mapbox://styles/urbaninstitute/cjm9fzb762tdd2ro26791vasq"
-        containerStyle={{
-          height: "100vh",
-          width: "100vw"
-        }}
-      />
+      <div>
+        <div className="inline-block absolute top left mt12 ml12 bg-darken75 color-white z1 py6 px12 round-full txt-s txt-bold">
+          <div>{`Longitude: ${lng} Latitude: ${lat} Zoom: ${zoom}`}</div>
+        </div>
+        <div ref={el => this.mapContainer = el} className="absolute top right left bottom" />
+      </div>
     );
   }
+  
 }
 
-export default Application;
+export default App;
