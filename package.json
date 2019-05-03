@@ -3,8 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "dirty-reprojectors": "0.0.2",
+    "mapbox-gl": "^0.39.1",
+    "prop-types": "^15.5.10",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "react-map-gl": "^4.1.2",
     "react-scripts": "3.0.0"
   },
   "scripts": {
