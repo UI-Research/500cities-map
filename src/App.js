@@ -19,9 +19,7 @@ class App extends Component {
   componentDidMount() {
 
     const granteeStyle = 'mapbox://styles/urbaninstitute/cjv8964e6apjc1fo42nrwlp2l';
-
     const { lng, lat, zoom } = this.state;
-
     const map = new mapboxgl.Map({
       container: this.mapContainer,
       style: granteeStyle,
@@ -29,7 +27,7 @@ class App extends Component {
       zoom
     });
 
-    var geojson = {
+    const geojson = {
       type: 'FeatureCollection',
       features: [{
         type: 'Feature',
@@ -55,17 +53,15 @@ class App extends Component {
       }]
     };
 
-    
-
     // add markers to map
     geojson.features.forEach(function(marker) {
 
       // create a HTML element for each feature
-      var el = document.createElement('div');
+      const el = document.createElement('div');
       el.className = 'marker';
 
       // Adjust the projection to match our special map
-      // TODO: credit this in comments at least!
+      // @see https://github.com/developmentseed/dirty-reprojectors/issues/12.
       let R = 6378137.0; // radius of Earth in meters
       const projection = d3.geoAlbersUsa().translate([0, 0]).scale(R);
       const projectionMercartor = d3.geoMercator().translate([0, 0]).scale(R);
@@ -73,8 +69,8 @@ class App extends Component {
       // make a marker for each feature and add to the map
       new mapboxgl.Marker(el)
         .setLngLat(projectionMercartor.invert(projection(marker.geometry.coordinates)))
-        .setPopup(new mapboxgl.Popup({ offset: 25 }) // add popups
-          .setHTML('<h3>' + marker.properties.title + '</h3><p>' + marker.properties.description + '</p>'))
+        .setPopup(new mapboxgl.Popup({ offset: 25, className: 'bg-secondary' }) // add popups
+          .setHTML('<h3 class="text-primary">' + marker.properties.title + '</h3><p>' + marker.properties.description + '</p>'))
         .addTo(map);
 
     });
