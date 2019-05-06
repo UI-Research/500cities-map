@@ -27,6 +27,12 @@ class App extends Component {
       zoom
     });
 
+    // Setup albersUSA projection for markers.
+    // @see https://github.com/developmentseed/dirty-reprojectors/issues/12.
+    let R = 6378137.0; // radius of Earth in meters
+    const projection = d3.geoAlbersUsa().translate([0, 0]).scale(R);
+    const projectionMercartor = d3.geoMercator().translate([0, 0]).scale(R);
+    
     const geojson = {
       type: 'FeatureCollection',
       features: [{
@@ -38,6 +44,17 @@ class App extends Component {
         properties: {
           title: 'Mapbox',
           description: 'Washington, D.C.'
+        }
+      },
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [-159.8175044, 22.0506879]
+        },
+        properties: {
+          title: 'Kauai',
+          description: 'Does a point on the island show up?'
         }
       },
       {
@@ -60,19 +77,12 @@ class App extends Component {
       const el = document.createElement('div');
       el.className = 'marker';
 
-      // Adjust the projection to match our special map
-      // @see https://github.com/developmentseed/dirty-reprojectors/issues/12.
-      let R = 6378137.0; // radius of Earth in meters
-      const projection = d3.geoAlbersUsa().translate([0, 0]).scale(R);
-      const projectionMercartor = d3.geoMercator().translate([0, 0]).scale(R);
-
       // make a marker for each feature and add to the map
       new mapboxgl.Marker(el)
         .setLngLat(projectionMercartor.invert(projection(marker.geometry.coordinates)))
-        .setPopup(new mapboxgl.Popup({ offset: 25, className: 'bg-secondary' }) // add popups
-          .setHTML('<h3 class="text-primary">' + marker.properties.title + '</h3><p>' + marker.properties.description + '</p>'))
+        .setPopup(new mapboxgl.Popup({ offset: 25, className: 'bg-info' }) // add popups
+          .setHTML('<h3 class="text-secondary">' + marker.properties.title + '</h3><p class="lead">' + marker.properties.description + '</p>'))
         .addTo(map);
-
     });
 
     map.on('move', () => {
