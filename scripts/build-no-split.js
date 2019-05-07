@@ -3,6 +3,12 @@ const rewire = require('rewire');
 const defaults = rewire('react-scripts/scripts/build.js');
 const config = defaults.__get__('config');
 
+// Use external version of React
+config.externals = {
+  "react": "React",
+  "react-dom": "ReactDOM"
+};
+
 // Consolidate chunk files instead
 config.optimization.splitChunks = {
   cacheGroups: {
