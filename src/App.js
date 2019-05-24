@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import mapboxgl from 'mapbox-gl';
 
 const d3 = require('d3-geo');
+const axios = require('axios');
 
 mapboxgl.accessToken = 'pk.eyJ1IjoidXJiYW5pbnN0aXR1dGUiLCJhIjoiTEJUbmNDcyJ9.mbuZTy4hI_PWXw3C3UFbDQ';
 
@@ -33,61 +34,41 @@ class App extends Component {
     const projection = d3.geoAlbersUsa().translate([0, 0]).scale(R);
     const projectionMercartor = d3.geoMercator().translate([0, 0]).scale(R);
     
-    const geojson = {
-      type: 'FeatureCollection',
-      features: [{
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [-77.032, 38.913]
-        },
-        properties: {
-          title: 'Mapbox',
-          description: 'Washington, D.C.'
-        }
-      },
-      {
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [-159.8175044, 22.0506879]
-        },
-        properties: {
-          title: 'Kauai',
-          description: 'Does a point on the island show up?'
-        }
-      },
-      {
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [-122.414, 37.776]
-        },
-        properties: {
-          title: 'Mapbox',
-          description: 'San Francisco, California'
-        }
-      }]
-    };
+    // TODO: this should be webpack config override.
+    axios.get("http://urban-500cities.lndo.site/grantee-feature-feed")
+    .then(function (response) {
+      
+      // handle success
+      console.log(response);
 
-    // add markers to map
-    geojson.features.forEach(function(marker) {
+      // add markers to map
+      response.data.features.forEach(function(marker) {
+        // create a HTML element for each feature
+        const el = document.createElement('div');
+        el.className = 'marker';
+        // make a marker for each feature and add to the map
 
-      // create a HTML element for each feature
-      const el = document.createElement('div');
-      el.className = 'marker';
+        var html = '<h3 class="text-secondary">' + marker.properties.name + '</h3><p>' + marker.properties.focusArea + '</p><p>' + marker.properties.city + ', ' + marker.properties.state + '</p>';
 
-      // make a marker for each feature and add to the map
-      new mapboxgl.Marker(el)
-        .setLngLat(projectionMercartor.invert(projection(marker.geometry.coordinates)))
-        .setPopup(new mapboxgl.Popup({ offset: 25, className: 'bg-info' }) // add popups
-          .setHTML('<h3 class="text-secondary">' + marker.properties.title + '</h3><p class="lead">' + marker.properties.description + '</p>'))
-        .addTo(map);
+
+        new mapboxgl.Marker(el)
+          .setLngLat(projectionMercartor.invert(projection(marker.geometry.coordinates)))
+          .setPopup(new mapboxgl.Popup({ offset: 25, className: 'challenge-' + marker.properties.challengeTypeId }) // add popups
+            .setHTML(html))
+          .addTo(map);
+      });
+      
+    })
+    .catch(function (error) {
+      // handle error
+      console.log(error);
+    })
+    .finally(function () {
+      // always executed
     });
 
     map.on('move', () => {
       const { lng, lat } = map.getCenter();
-
       this.setState({
         lng: lng.toFixed(4),
         lat: lat.toFixed(4),
