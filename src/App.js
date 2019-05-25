@@ -34,8 +34,10 @@ class App extends Component {
     const projection = d3.geoAlbersUsa().translate([0, 0]).scale(R);
     const projectionMercartor = d3.geoMercator().translate([0, 0]).scale(R);
     
+    console.log(process);
+
     // TODO: this should be webpack config override.
-    axios.get("http://urban-500cities.lndo.site/grantee-feature-feed")
+    axios.get(process.env.REACT_APP_API_URL)
     .then(function (response) {
       
       // handle success
@@ -49,7 +51,6 @@ class App extends Component {
         // make a marker for each feature and add to the map
 
         var html = '<h3 class="text-secondary">' + marker.properties.name + '</h3><p>' + marker.properties.focusArea + '</p><p>' + marker.properties.city + ', ' + marker.properties.state + '</p>';
-
 
         new mapboxgl.Marker(el)
           .setLngLat(projectionMercartor.invert(projection(marker.geometry.coordinates)))
