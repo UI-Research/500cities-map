@@ -21,13 +21,6 @@ class App extends Component {
 
   componentDidMount() {
 
-
-    // const sw = new mapboxgl.LngLat(-330.9230816156929, -85.05112899999993);
-    // const ne = new mapboxgl.LngLat(330.9230816157313, 85.0511290000006);
-    // const initBounds = new mapboxgl.LngLatBounds(sw, ne);
-
-  //  console.log(initBounds);
-
     // Enable Fontawesome immediately
     fontawesome();
 
@@ -43,11 +36,6 @@ class App extends Component {
       logoPosition: 'bottom-right',
       attributionControl: false
     });
-    // map.addControl(new mapboxgl.AttributionControl(), 'top-left');
-
-    //let bounds = new mapboxgl.LngLatBounds();
-
-    //let bounds = map.getBounds();
 
     // Find all active markers and de-activate.
     function clearMarkers() {
@@ -67,14 +55,8 @@ class App extends Component {
     axios.get(process.env.REACT_APP_API_URL)
     .then(function (response) {
 
-      //let bounds = new mapboxgl.LngLatBounds();
-
-      //console.log(bounds)
-
       // add markers to map
       response.data.features.forEach(function(marker) {
-
-        //bounds.extend(marker.geometry.coordinates);
 
         // create a HTML element for each feature
         const el = document.createElement('div');
@@ -94,7 +76,7 @@ class App extends Component {
             <p class="mb-0">${marker.properties.focusArea}</p>
           </div>
           <div class="mapboxgl-popup-cta">
-            <a href="#" class="mapboxgl-popup-link">View Grantee ${linkIcon}</a>
+            <a href="${marker.properties.link}" class="mapboxgl-popup-link">View Grantee ${linkIcon}</a>
           </div>
         `;
 
@@ -123,8 +105,6 @@ class App extends Component {
           }
         })
       });
-
-      //map.fitBounds(bounds, { padding: 5 });
 
       // Toggle marker borders when closing via map click.
       map.on('click', e => {
