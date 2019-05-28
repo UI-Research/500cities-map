@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import mapboxgl from 'mapbox-gl';
 
+import fontawesome from './fontawesome';
+
 const d3 = require('d3-geo');
 const axios = require('axios');
 
@@ -19,6 +21,11 @@ class App extends Component {
 
   componentDidMount() {
 
+    // Enable Fontawesome immediately
+    fontawesome();
+
+    const linkIcon = '<i class="fas fa-chevron-right"></i>';
+
     const granteeStyle = 'mapbox://styles/urbaninstitute/cjv8964e6apjc1fo42nrwlp2l';
     const { lng, lat, zoom } = this.state;
     const map = new mapboxgl.Map({
@@ -28,37 +35,78 @@ class App extends Component {
       zoom
     });
 
+    // Find all active markers and de-activate.
+    function clearMarkers() {
+      const activeMarkers = document.getElementsByClassName('marker-active');
+      let i;
+      for (i = 0; i < activeMarkers.length; i++) {
+        activeMarkers[i].classList.remove('marker-active'); 
+      }
+    }
+ 
     // Setup albersUSA projection for markers.
     // @see https://github.com/developmentseed/dirty-reprojectors/issues/12.
     let R = 6378137.0; // radius of Earth in meters
     const projection = d3.geoAlbersUsa().translate([0, 0]).scale(R);
     const projectionMercartor = d3.geoMercator().translate([0, 0]).scale(R);
-    
-    console.log(process);
-
-    // TODO: this should be webpack config override.
+    // API URL set in .env
     axios.get(process.env.REACT_APP_API_URL)
     .then(function (response) {
-      
-      // handle success
-      console.log(response);
-
       // add markers to map
       response.data.features.forEach(function(marker) {
         // create a HTML element for each feature
         const el = document.createElement('div');
         el.className = 'marker';
-        // make a marker for each feature and add to the map
+        // set color based on challenge type.
+        if (marker.properties.challengeTypeId === '1') {
+            el.style.backgroundColor = '#1696d2';
+        }
+        else {
+          el.style.backgroundColor = '#fdbf11';
+        }
+        // Create markup for popup.
+        const markup = `
+          <div class="mapboxgl-popup-body">
+            <h3 class="mb-2">${marker.properties.name}</h3>
+            <p class="mb-0 font-italic">${marker.properties.city}. ${marker.properties.state}</p>
+            <p class="mb-0">${marker.properties.focusArea}</p>
+          </div>
+          <div class="mapboxgl-popup-cta">
+            <a href="#" class="mapboxgl-popup-link">View Grantee ${linkIcon}</a>
+          </div>
+        `;
 
-        var html = '<h3 class="text-secondary">' + marker.properties.name + '</h3><p>' + marker.properties.focusArea + '</p><p>' + marker.properties.city + ', ' + marker.properties.state + '</p>';
+        // Create a popup object.
+        let mypopup = new mapboxgl.Popup({ 
+          offset: 25, 
+          className: 'challenge-' + marker.properties.challengeTypeId,
+          maxWidth: '175px' 
+        })
+          .setHTML(markup);
 
+        // Add marker with related popop to the map.
         new mapboxgl.Marker(el)
           .setLngLat(projectionMercartor.invert(projection(marker.geometry.coordinates)))
-          .setPopup(new mapboxgl.Popup({ offset: 25, className: 'challenge-' + marker.properties.challengeTypeId }) // add popups
-            .setHTML(html))
+          .setPopup(mypopup) // add popups
           .addTo(map);
+
+         // Toggle border style on marker click.
+        el.addEventListener('click', e => {
+          if (!el.classList.contains('marker-active')) {
+            clearMarkers();
+            e.target.classList.add('marker-active');
+          }
+          else {
+            el.classList.remove('marker-active');
+          }
+        })
       });
-      
+      // Toggle marker borders when closing via map click.
+      map.on('click', e => {
+        if (e.originalEvent.target.className === 'mapboxgl-canvas') {
+          clearMarkers();
+        }
+      });
     })
     .catch(function (error) {
       // handle error
@@ -67,30 +115,14 @@ class App extends Component {
     .finally(function () {
       // always executed
     });
-
-    map.on('move', () => {
-      const { lng, lat } = map.getCenter();
-      this.setState({
-        lng: lng.toFixed(4),
-        lat: lat.toFixed(4),
-        zoom: map.getZoom().toFixed(2)
-      });
-    });
   }
-
   render() {
-    const { lng, lat, zoom } = this.state;
-
     return (
       <div>
-        <div className="inline-block absolute top left mt12 ml12 bg-darken75 color-white z1 py6 px12 round-full txt-s txt-bold">
-          <div>{`Longitude: ${lng} Latitude: ${lat} Zoom: ${zoom}`}</div>
-        </div>
         <div ref={el => this.mapContainer = el} className="absolute top right left bottom" />
       </div>
     );
   }
-  
 }
 
 export default App;
