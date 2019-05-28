@@ -1,11 +1,9 @@
 #app {
   position: relative;
-  width: 100%;
-  min-height: 800px;
+  min-height: 650px;
 }
 
-.marker,
-.marker-active {
+.marker {
     width: 15px;
     height: 15px;
     border-radius: 50%;
@@ -17,5 +15,5 @@
 }
 
 .mapboxgl-popup {
-  min-width: 100px;
+  min-width: 135px;
 }

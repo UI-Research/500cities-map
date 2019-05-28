@@ -13,27 +13,41 @@ class App extends Component {
   constructor(props: Props) {
     super(props);
     this.state = {
-      lng: -1.9209,
-      lat: 2.5328,
-      zoom: 3.71
+      lng: -0.925,
+      lat: 0.985,
+      zoom: 4.00
     };
   }
 
   componentDidMount() {
 
+
+    // const sw = new mapboxgl.LngLat(-330.9230816156929, -85.05112899999993);
+    // const ne = new mapboxgl.LngLat(330.9230816157313, 85.0511290000006);
+    // const initBounds = new mapboxgl.LngLatBounds(sw, ne);
+
+  //  console.log(initBounds);
+
     // Enable Fontawesome immediately
     fontawesome();
 
     const linkIcon = '<i class="fas fa-chevron-right"></i>';
-
     const granteeStyle = 'mapbox://styles/urbaninstitute/cjv8964e6apjc1fo42nrwlp2l';
     const { lng, lat, zoom } = this.state;
     const map = new mapboxgl.Map({
       container: this.mapContainer,
       style: granteeStyle,
+      pitchWithRotate: false,
       center: [lng, lat],
-      zoom
+      zoom,
+      logoPosition: 'bottom-right',
+      attributionControl: false
     });
+    // map.addControl(new mapboxgl.AttributionControl(), 'top-left');
+
+    //let bounds = new mapboxgl.LngLatBounds();
+
+    //let bounds = map.getBounds();
 
     // Find all active markers and de-activate.
     function clearMarkers() {
@@ -43,7 +57,7 @@ class App extends Component {
         activeMarkers[i].classList.remove('marker-active'); 
       }
     }
- 
+    
     // Setup albersUSA projection for markers.
     // @see https://github.com/developmentseed/dirty-reprojectors/issues/12.
     let R = 6378137.0; // radius of Earth in meters
@@ -52,8 +66,16 @@ class App extends Component {
     // API URL set in .env
     axios.get(process.env.REACT_APP_API_URL)
     .then(function (response) {
+
+      //let bounds = new mapboxgl.LngLatBounds();
+
+      //console.log(bounds)
+
       // add markers to map
       response.data.features.forEach(function(marker) {
+
+        //bounds.extend(marker.geometry.coordinates);
+
         // create a HTML element for each feature
         const el = document.createElement('div');
         el.className = 'marker';
@@ -101,12 +123,23 @@ class App extends Component {
           }
         })
       });
+
+      //map.fitBounds(bounds, { padding: 5 });
+
       // Toggle marker borders when closing via map click.
       map.on('click', e => {
         if (e.originalEvent.target.className === 'mapboxgl-canvas') {
           clearMarkers();
         }
       });
+
+      // map.on('move', e => {
+      //   console.log(bounds);
+      // });
+
+      //map.resize();
+
+     // console.log(map);
     })
     .catch(function (error) {
       // handle error
@@ -118,9 +151,7 @@ class App extends Component {
   }
   render() {
     return (
-      <div>
         <div ref={el => this.mapContainer = el} className="absolute top right left bottom" />
-      </div>
     );
   }
 }
