@@ -10,7 +10,7 @@ mapboxgl.accessToken = 'pk.eyJ1IjoidXJiYW5pbnN0aXR1dGUiLCJhIjoiTEJUbmNDcyJ9.mbuZ
 
 class App extends Component {
 
-  constructor(props: Props) {
+  constructor(props) {
     super(props);
     this.state = {
       lng: -0.925,
@@ -34,7 +34,13 @@ class App extends Component {
       center: [lng, lat],
       zoom,
       logoPosition: 'bottom-right',
-      attributionControl: false
+      attributionControl: false,
+      scrollZoom: false,
+      boxZoom: false,
+      trackResize: true,
+      minZoom: 4.00,
+      dragRotate: false,
+      renderWorldCopies: false,
     });
 
     // Find all active markers and de-activate.
@@ -55,8 +61,23 @@ class App extends Component {
     axios.get(process.env.REACT_APP_API_URL)
     .then(function (response) {
 
+
+
+      let dups = [];
+      let myOffset = [];
+
       // add markers to map
       response.data.features.forEach(function(marker) {
+
+        // Look for duplicate locations and offset the second one.
+        const latLnString = marker.geometry.coordinates.join('+');
+        myOffset = [0, 0];
+        if ( dups.includes(latLnString) ) {
+          myOffset = [-10, -10];
+        }
+        else {
+          dups.push(latLnString);
+        }
 
         // create a HTML element for each feature
         const el = document.createElement('div');
@@ -68,6 +89,9 @@ class App extends Component {
         else {
           el.style.backgroundColor = '#fdbf11';
         }
+
+
+
         // Create markup for popup.
         const markup = `
           <div class="mapboxgl-popup-body">
@@ -89,10 +113,12 @@ class App extends Component {
           .setHTML(markup);
 
         // Add marker with related popop to the map.
-        new mapboxgl.Marker(el)
-          .setLngLat(projectionMercartor.invert(projection(marker.geometry.coordinates)))
-          .setPopup(mypopup) // add popups
-          .addTo(map);
+        new mapboxgl.Marker(el, {
+          offset: myOffset
+        })
+        .setLngLat(projectionMercartor.invert(projection(marker.geometry.coordinates)))
+        .setPopup(mypopup) // add popups
+        .addTo(map);
 
          // Toggle border style on marker click.
         el.addEventListener('click', e => {
@@ -113,13 +139,15 @@ class App extends Component {
         }
       });
 
-      // map.on('move', e => {
-      //   console.log(bounds);
-      // });
+      map.on('load', e => {
+        map.resize();
+      });
 
-      //map.resize();
+      map.on('data', e => {
+        const loadingIcons = document.getElementsByClassName('loading-icon')[0];
+        loadingIcons.classList.add('d-none');
+      });
 
-     // console.log(map);
     })
     .catch(function (error) {
       // handle error
@@ -131,7 +159,12 @@ class App extends Component {
   }
   render() {
     return (
+      <>
         <div ref={el => this.mapContainer = el} className="absolute top right left bottom" />
+        <div className="loading-icon" role="status">
+          <i className="fas fa-circle-notch fa-spin fa-5x text-primary"></i>
+        </div>
+      </>
     );
   }
 }

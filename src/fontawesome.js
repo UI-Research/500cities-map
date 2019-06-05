@@ -2,11 +2,13 @@ import { library, dom } from '@fortawesome/fontawesome-svg-core';
 // Import specific icons required
 import {
   faChevronRight,
+  faCircleNotch,
 } from '@fortawesome/free-solid-svg-icons';
 
 
 // Add specific icons required
 library.add(
+  faCircleNotch,
   faChevronRight
 );
 
