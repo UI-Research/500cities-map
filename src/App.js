@@ -37,6 +37,8 @@ class App extends Component {
       renderWorldCopies: false,
       scrollZoom: false,
       dragPan: false,
+      doubleClickZoom: false,
+      touchZoomRotate: false,
     });
     // Find all active markers and de-activate.
     function clearMarkers() {
