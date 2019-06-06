@@ -42,7 +42,7 @@ class App extends Component {
       dragRotate: false,
       renderWorldCopies: false,
     });
-
+    
     // Find all active markers and de-activate.
     function clearMarkers() {
       const activeMarkers = document.getElementsByClassName('marker-active');
@@ -51,7 +51,7 @@ class App extends Component {
         activeMarkers[i].classList.remove('marker-active'); 
       }
     }
-    
+
     // Setup albersUSA projection for markers.
     // @see https://github.com/developmentseed/dirty-reprojectors/issues/12.
     let R = 6378137.0; // radius of Earth in meters
@@ -60,8 +60,6 @@ class App extends Component {
     // API URL set in .env
     axios.get(process.env.REACT_APP_API_URL)
     .then(function (response) {
-
-
 
       let dups = [];
       let myOffset = [];
@@ -73,7 +71,7 @@ class App extends Component {
         const latLnString = marker.geometry.coordinates.join('+');
         myOffset = [0, 0];
         if ( dups.includes(latLnString) ) {
-          myOffset = [-10, -10];
+          myOffset = [-8, -8];
         }
         else {
           dups.push(latLnString);
@@ -89,8 +87,6 @@ class App extends Component {
         else {
           el.style.backgroundColor = '#fdbf11';
         }
-
-
 
         // Create markup for popup.
         const markup = `
@@ -139,30 +135,29 @@ class App extends Component {
         }
       });
 
-      map.on('load', e => {
-        map.resize();
-      });
-
-      map.on('data', e => {
-        const loadingIcons = document.getElementsByClassName('loading-icon')[0];
-        loadingIcons.classList.add('d-none');
-      });
-
     })
     .catch(function (error) {
-      // handle error
+      // handle error. Display alert.
       console.log(error);
+      document.getElementsByClassName('error-message')[0].classList.remove('d-none');
     })
     .finally(function () {
-      // always executed
+      // always executed. Remove loading icon.
+      document.getElementsByClassName('loading-icon')[0].classList.add('d-none');
     });
   }
+
   render() {
     return (
       <>
         <div ref={el => this.mapContainer = el} className="absolute top right left bottom" />
         <div className="loading-icon" role="status">
-          <i className="fas fa-circle-notch fa-spin fa-5x text-primary"></i>
+          <i className="fas fa-circle-notch fa-spin fa-4x text-primary"></i>
+        </div>
+        <div className="error-message d-none">
+          <div className="alert alert-danger" role="alert">
+            There was a problem loading Grantees.
+          </div>
         </div>
       </>
     );
