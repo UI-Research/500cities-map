@@ -101,14 +101,14 @@ class App extends Component {
           className: 'challenge-' + marker.properties.challengeTypeId,
           maxWidth: '175px' 
         });
-        map.on('mouseenter', el , function (e) {
+        map.on('mouseenter', marker , function (e) {
           // Change the cursor style as a UI indicator.
           map.getCanvas().style.cursor = 'pointer';
 
           mypopup.setHTML(markup);
         } );
 
-        map.on('mouseleave', el , function() {
+        map.on('mouseleave', marker , function() {
           map.getCanvas().style.cursor = '';
           mypopup.remove();
         });
@@ -121,7 +121,7 @@ class App extends Component {
         .setPopup(mypopup) // add popups
         .addTo(map);
          // Toggle border style on marker click.
-        el.addEventListener('mouseover', e => {
+        el.addEventListener('mouseenter', marker, function (e) {
           if (!el.classList.contains('marker-active')) {
             clearMarkers();
             e.target.classList.add('marker-active');
