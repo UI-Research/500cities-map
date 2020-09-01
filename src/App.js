@@ -100,8 +100,19 @@ class App extends Component {
           offset: 25, 
           className: 'challenge-' + marker.properties.challengeTypeId,
           maxWidth: '175px' 
-        })
-          .setHTML(markup);
+        });
+        map.on('mouseenter', el , function (e) {
+          // Change the cursor style as a UI indicator.
+          map.getCanvas().style.cursor = 'pointer';
+
+          mypopup.setHTML(markup);
+        } );
+
+        map.on('mouseleave', el , function() {
+          map.getCanvas().style.cursor = '';
+          mypopup.remove();
+        });
+
         // Add marker with related popop to the map.
         new mapboxgl.Marker(el, {
           offset: myOffset
