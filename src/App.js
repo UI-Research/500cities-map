@@ -110,7 +110,7 @@ class App extends Component {
         .setPopup(mypopup) // add popups
         .addTo(map);
          // Toggle border style on marker click.
-        el.addEventListener('click', e => {
+        el.addEventListener('mouseover', e => {
           if (!el.classList.contains('marker-active')) {
             clearMarkers();
             e.target.classList.add('marker-active');
