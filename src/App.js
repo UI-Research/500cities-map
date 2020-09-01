@@ -79,8 +79,10 @@ class App extends Component {
         if (marker.properties.challengeTypeId === '1') {
             el.style.backgroundColor = '#1696d2';
         }
-        else {
+        else if (marker.properties.challengeTypeId === '2') {
           el.style.backgroundColor = '#fdbf11';
+        } else {
+          el.style.backgroundColor = '#55B748';
         }
         // Create markup for popup.
         const markup = `
@@ -108,7 +110,7 @@ class App extends Component {
         .setPopup(mypopup) // add popups
         .addTo(map);
          // Toggle border style on marker click.
-        el.addEventListener('click', e => {
+        el.addEventListener('mouseover', e => {
           if (!el.classList.contains('marker-active')) {
             clearMarkers();
             e.target.classList.add('marker-active');
