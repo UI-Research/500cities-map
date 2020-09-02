@@ -75,6 +75,8 @@ class App extends Component {
         // create a HTML element for each feature
         const el = document.createElement('div');
         el.className = 'marker';
+        // Add class "challenge-tid" to each marker
+        el.classList.add('challenge-'+ marker.properties.challengeTypeId);
         // set color based on challenge type.
         if (marker.properties.challengeTypeId === '1') {
             el.style.backgroundColor = '#1696d2';
@@ -100,18 +102,8 @@ class App extends Component {
           offset: 25, 
           className: 'challenge-' + marker.properties.challengeTypeId,
           maxWidth: '175px' 
-        });
-        map.on('mouseenter', marker , function (e) {
-          // Change the cursor style as a UI indicator.
-          map.getCanvas().style.cursor = 'pointer';
-
-          mypopup.setHTML(markup);
-        } );
-
-        map.on('mouseleave', marker , function() {
-          map.getCanvas().style.cursor = '';
-          mypopup.remove();
-        });
+        })
+            .setHTML(markup);
 
         // Add marker with related popop to the map.
         new mapboxgl.Marker(el, {
@@ -121,13 +113,16 @@ class App extends Component {
         .setPopup(mypopup) // add popups
         .addTo(map);
          // Toggle border style on marker click.
-        el.addEventListener('mouseenter', marker, function (e) {
-          if (!el.classList.contains('marker-active')) {
+        el.addEventListener('mouseover', e =>  {
+          if (!el.classList
+              .contains('marker-active', 'challenge-'+ marker.properties.challengeTypeId)) {
             clearMarkers();
-            e.target.classList.add('marker-active');
+            e.target.classList
+                .add('marker-active');
           }
           else {
-            el.classList.remove('marker-active');
+            el.classList
+                .remove('marker-active');
           }
         })
       });
