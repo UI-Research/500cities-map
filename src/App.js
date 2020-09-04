@@ -79,10 +79,10 @@ class App extends Component {
         el.classList.add('challenge-'+ marker.properties.challengeTypeId);
         // set color based on challenge type.
         if (marker.properties.challengeTypeId === '1') {
-            el.style.backgroundColor = '#1696d2';
+            el.style.backgroundColor = '#fdbf11';
         }
         else if (marker.properties.challengeTypeId === '2') {
-          el.style.backgroundColor = '#fdbf11';
+          el.style.backgroundColor = '#1696d2';
         } else {
           el.style.backgroundColor = '#55B748';
         }
