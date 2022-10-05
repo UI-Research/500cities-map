@@ -30,7 +30,7 @@ class App extends Component {
       style: granteeStyle,
       pitchWithRotate: false,
       center: [lng, lat],
-      zoom,
+      zoom: 4,
       logoPosition: "bottom-right",
       attributionControl: false,
       boxZoom: false,
@@ -163,7 +163,7 @@ class App extends Component {
       <>
         <div
           ref={(el) => (this.mapContainer = el)}
-          className="absolute top right left bottom"
+          className="absolute top right left bottom border"
         />
         <div className="loading-icon" role="status">
           <i className="fas fa-circle-notch fa-spin fa-4x text-primary"></i>
