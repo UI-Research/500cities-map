@@ -8,7 +8,6 @@ mapboxgl.accessToken =
   "pk.eyJ1IjoidXJiYW5pbnN0aXR1dGUiLCJhIjoiTEJUbmNDcyJ9.mbuZTy4hI_PWXw3C3UFbDQ";
 
 class App extends Component {
-  
   constructor(props) {
     super(props);
     this.state = {
@@ -30,7 +29,7 @@ class App extends Component {
       style: granteeStyle,
       pitchWithRotate: false,
       center: [lng, lat],
-      zoom: 4,
+      zoom,
       logoPosition: "bottom-right",
       attributionControl: false,
       boxZoom: false,
