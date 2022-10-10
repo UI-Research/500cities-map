@@ -41,6 +41,10 @@ class App extends Component {
       doubleClickZoom: true,
       touchZoomRotate: false,
     });
+
+    // Add zoom and rotation controls to the map.
+    map.addControl(new mapboxgl.NavigationControl());
+
     // Find all active markers and de-activate.
     function clearMarkers() {
       const activeMarkers = document.getElementsByClassName("marker-active");
