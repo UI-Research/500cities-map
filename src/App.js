@@ -4,6 +4,9 @@ import fontawesome from "./fontawesome";
 const d3 = require("d3-geo");
 const axios = require("axios");
 
+//https://github.com/stamen/geo-albers-usa-territories
+const geoAlbersUsaTerritories = require("geo-albers-usa-territories");
+
 mapboxgl.accessToken =
   "pk.eyJ1IjoidXJiYW5pbnN0aXR1dGUiLCJhIjoiTEJUbmNDcyJ9.mbuZTy4hI_PWXw3C3UFbDQ";
 
@@ -56,8 +59,17 @@ class App extends Component {
     // Setup albersUSA projection for markers.
     // @see https://github.com/developmentseed/dirty-reprojectors/issues/12.
     let R = 6378137.0; // radius of Earth in meters
-    const projection = d3.geoAlbersUsa().translate([0, 0]).scale(R);
+    // This line commented out and projectionTerritories added instead
+    // const projection = d3.geoAlbersUsa().translate([0, 0]).scale(R);
+
+    // Setup to include US territories projectd into the map
+    // @see https://github.com/d3/d3-geo/issues/152
+    const projectionTerritories = geoAlbersUsaTerritories
+      .geoAlbersUsaTerritories()
+      .translate([0, 0])
+      .scale(R);
     const projectionMercartor = d3.geoMercator().translate([0, 0]).scale(R);
+
     // API URL set in .env
     axios
       .get(process.env.REACT_APP_API_URL)
@@ -115,7 +127,7 @@ class App extends Component {
           })
             .setLngLat(
               projectionMercartor.invert(
-                projection(marker.geometry.coordinates)
+                projectionTerritories(marker.geometry.coordinates)
               )
             )
             .setPopup(mypopup) // add popups
