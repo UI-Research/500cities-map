@@ -9,7 +9,7 @@
     "d3-geo": "^3.0.1",
     "d3-geo-projection": "^2.9.0",
     "geo-albers-usa-territories": "^0.1.0",
-    "mapbox-gl": "^0.54.0",
+    "mapbox-gl": "^2.10.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-scripts": "3.0.0"
