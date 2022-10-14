@@ -16,7 +16,7 @@ class App extends Component {
     this.state = {
       lng: -0.925,
       lat: 0.985,
-      zoom: 4.0,
+      zoom: 3.9,
     };
   }
 
